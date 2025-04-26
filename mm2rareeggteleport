@@ -1,32 +1,38 @@
--- Arcues X için MM2 Rare Egg Farm GUI V2 (Blur, Sürüklenebilir, Estetik)
+portToRareEgg()
+    else
+        ToggleButton.Text = "Start"
+    end
+end)
+-- Arcues X için MM2 Rare Egg Farm GUI (Fixli)
 
-local player = game.Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
+-- Önce Blur kapatılsın (eğer daha önceden varsa)
+for _, v in pairs(game.Lighting:GetChildren()) do
+    if v:IsA("BlurEffect") then
+        v:Destroy()
+    end
+end
 
--- Rare Egg isimleri (gerekirse güncelleriz)
-local rareEggNames = {
-    "Rare Egg", -- Eğer başka özel yumurta isimleri varsa buraya ekle
-}
-
--- Blur Arka Plan
-local blur = Instance.new("BlurEffect", game.Lighting)
+-- Blur Efekti
+local blur = Instance.new("BlurEffect")
 blur.Size = 10
+blur.Parent = game.Lighting
 
 -- GUI Oluştur
-local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
-local Frame = Instance.new("Frame", ScreenGui)
-local Title = Instance.new("TextLabel", Frame)
-local ToggleButton = Instance.new("TextButton", Frame)
-
+local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "RareEggGUI"
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui") -- !!! PlayerGui içine attık
+
+local Frame = Instance.new("Frame")
+Frame.Parent = ScreenGui
 Frame.Size = UDim2.new(0, 250, 0, 150)
 Frame.Position = UDim2.new(0.5, -125, 0.3, 0)
 Frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 Frame.BackgroundTransparency = 0.2
-Frame.BorderSizePixel = 0
 Frame.Active = true
-Frame.Draggable = true -- Sürüklenebilir!
+Frame.Draggable = true
 
+local Title = Instance.new("TextLabel")
+Title.Parent = Frame
 Title.Size = UDim2.new(1, 0, 0, 30)
 Title.BackgroundTransparency = 1
 Title.Text = "Rare Egg Farm"
@@ -34,6 +40,8 @@ Title.Font = Enum.Font.GothamBold
 Title.TextSize = 20
 Title.TextColor3 = Color3.new(1, 1, 1)
 
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Parent = Frame
 ToggleButton.Size = UDim2.new(0, 200, 0, 50)
 ToggleButton.Position = UDim2.new(0.5, -100, 0.5, -25)
 ToggleButton.Text = "Start"
@@ -43,7 +51,15 @@ ToggleButton.TextColor3 = Color3.new(1, 1, 1)
 ToggleButton.Font = Enum.Font.GothamBold
 ToggleButton.TextSize = 18
 
+-- Değişkenler
 local farming = false
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+-- Rare Egg İsimleri
+local rareEggNames = {
+    "Rare Egg", -- Eğer farklı isim varsa buraya ekle
+}
 
 -- Ana Fonksiyon
 local function teleportToRareEgg()
@@ -52,12 +68,14 @@ local function teleportToRareEgg()
         for _, egg in pairs(workspace:GetDescendants()) do
             if egg:IsA("Part") or egg:IsA("MeshPart") then
                 if table.find(rareEggNames, egg.Name) then
-                    -- Bulduk, bildirim ver
-                    game.StarterGui:SetCore("SendNotification", {
-                        Title = "Rare Egg!",
-                        Text = "Teleport Yapılıyor...",
-                        Duration = 2
-                    })
+                    -- Bildirim
+                    pcall(function()
+                        game.StarterGui:SetCore("SendNotification", {
+                            Title = "Rare Egg!",
+                            Text = "Teleport Yapılıyor...",
+                            Duration = 2
+                        })
+                    end)
                     -- Teleport
                     character:PivotTo(CFrame.new(egg.Position + Vector3.new(0, 5, 0)))
                     task.wait(2)
@@ -68,7 +86,7 @@ local function teleportToRareEgg()
     end
 end
 
--- Buton Fonksiyon
+-- Buton İşlemleri
 ToggleButton.MouseButton1Click:Connect(function()
     farming = not farming
     if farming then
