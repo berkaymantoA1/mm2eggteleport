@@ -1,0 +1,80 @@
+-- Arcues X için MM2 Rare Egg Farm GUI V2 (Blur, Sürüklenebilir, Estetik)
+
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+-- Rare Egg isimleri (gerekirse güncelleriz)
+local rareEggNames = {
+    "Rare Egg", -- Eğer başka özel yumurta isimleri varsa buraya ekle
+}
+
+-- Blur Arka Plan
+local blur = Instance.new("BlurEffect", game.Lighting)
+blur.Size = 10
+
+-- GUI Oluştur
+local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+local Frame = Instance.new("Frame", ScreenGui)
+local Title = Instance.new("TextLabel", Frame)
+local ToggleButton = Instance.new("TextButton", Frame)
+
+ScreenGui.Name = "RareEggGUI"
+Frame.Size = UDim2.new(0, 250, 0, 150)
+Frame.Position = UDim2.new(0.5, -125, 0.3, 0)
+Frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+Frame.BackgroundTransparency = 0.2
+Frame.BorderSizePixel = 0
+Frame.Active = true
+Frame.Draggable = true -- Sürüklenebilir!
+
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.BackgroundTransparency = 1
+Title.Text = "Rare Egg Farm"
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 20
+Title.TextColor3 = Color3.new(1, 1, 1)
+
+ToggleButton.Size = UDim2.new(0, 200, 0, 50)
+ToggleButton.Position = UDim2.new(0.5, -100, 0.5, -25)
+ToggleButton.Text = "Start"
+ToggleButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+ToggleButton.BorderSizePixel = 0
+ToggleButton.TextColor3 = Color3.new(1, 1, 1)
+ToggleButton.Font = Enum.Font.GothamBold
+ToggleButton.TextSize = 18
+
+local farming = false
+
+-- Ana Fonksiyon
+local function teleportToRareEgg()
+    while farming do
+        task.wait(1)
+        for _, egg in pairs(workspace:GetDescendants()) do
+            if egg:IsA("Part") or egg:IsA("MeshPart") then
+                if table.find(rareEggNames, egg.Name) then
+                    -- Bulduk, bildirim ver
+                    game.StarterGui:SetCore("SendNotification", {
+                        Title = "Rare Egg!",
+                        Text = "Teleport Yapılıyor...",
+                        Duration = 2
+                    })
+                    -- Teleport
+                    character:PivotTo(CFrame.new(egg.Position + Vector3.new(0, 5, 0)))
+                    task.wait(2)
+                    break
+                end
+            end
+        end
+    end
+end
+
+-- Buton Fonksiyon
+ToggleButton.MouseButton1Click:Connect(function()
+    farming = not farming
+    if farming then
+        ToggleButton.Text = "Close"
+        teleportToRareEgg()
+    else
+        ToggleButton.Text = "Start"
+    end
+end)
